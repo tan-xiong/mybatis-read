@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.ibatis.example.mapper.ScheduleSettingMapper">
+
+
+    <select id="findByJobId" parameterType="java.lang.String"
+            resultType="org.apache.ibatis.example.entity.ScheduleSettingPO">
+       select * from schedule_setting where job_id=#{jobId,jdbcType=VARCHAR}
+    </select>
+
+</mapper>

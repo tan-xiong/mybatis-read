@@ -255,9 +255,13 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (context == null) {
       return;
     }
+    // 将子节点的 name 以及value属性set进properties对象
     Properties defaults = context.getChildrenAsProperties();
+    // 获取properties节点上 resource属性的值
     String resource = context.getStringAttribute("resource");
+    // 获取properties节点上 url属性的值
     String url = context.getStringAttribute("url");
+    // resource和url不能同时配置
     if (resource != null && url != null) {
       throw new BuilderException(
           "The properties element cannot specify both a URL and a resource based property file reference.  Please specify one or the other.");
@@ -267,11 +271,14 @@ public class XMLConfigBuilder extends BaseBuilder {
     } else if (url != null) {
       defaults.putAll(Resources.getUrlAsProperties(url));
     }
+    // 将configuration对象中已配置好的Properties值，放入Properties中
     Properties vars = configuration.getVariables();
     if (vars != null) {
       defaults.putAll(vars);
     }
+    // set到解析器中对象中
     parser.setVariables(defaults);
+    // set到configuration对象中
     configuration.setVariables(defaults);
   }
 

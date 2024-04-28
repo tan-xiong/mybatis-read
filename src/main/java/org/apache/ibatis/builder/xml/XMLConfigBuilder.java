@@ -155,8 +155,9 @@ public class XMLConfigBuilder extends BaseBuilder {
     if (context == null) {
       return new Properties();
     }
+    // 将子节点的 name 以及value属性set进properties对象
     Properties props = context.getChildrenAsProperties();
-    // Check that all settings are known to the configuration class
+    // 检查配置类是否已知所有设置
     MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
     for (Object key : props.keySet()) {
       if (!metaConfig.hasSetter(String.valueOf(key))) {
@@ -324,16 +325,23 @@ public class XMLConfigBuilder extends BaseBuilder {
       return;
     }
     if (environment == null) {
+      // 获取default指定的环境
       environment = context.getStringAttribute("default");
     }
     for (XNode child : context.getChildren()) {
+      // environments 节点下可以拥有多个 environment子节点
+      // 获取environment的id
       String id = child.getStringAttribute("id");
+      // 根据environments的default属性去选择对应的enviroment
       if (isSpecifiedEnvironment(id)) {
+        // mybatis有两种事务：JDBC 和 MANAGED, JDBC是使用JDBC的事务，MANAGED是将事务托管给容器，
         TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+        // 解析enviroment节点下的dataSource节点
         DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
         DataSource dataSource = dsFactory.getDataSource();
         Environment.Builder environmentBuilder = new Environment.Builder(id).transactionFactory(txFactory)
             .dataSource(dataSource);
+        // set到configuration对象中
         configuration.setEnvironment(environmentBuilder.build());
         break;
       }

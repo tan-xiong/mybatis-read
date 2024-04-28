@@ -216,11 +216,15 @@ public class XMLConfigBuilder extends BaseBuilder {
   private void pluginsElement(XNode context) throws Exception {
     if (context != null) {
       for (XNode child : context.getChildren()) {
+        // 获取interceptor定义的插件
         String interceptor = child.getStringAttribute("interceptor");
+        // 将子节点的 name 以及value属性set进properties对象
         Properties properties = child.getChildrenAsProperties();
+        // 加载指定拦截器并创建实例
         Interceptor interceptorInstance = (Interceptor) resolveClass(interceptor).getDeclaredConstructor()
             .newInstance();
         interceptorInstance.setProperties(properties);
+        // 加入全局配置拦截器链
         configuration.addInterceptor(interceptorInstance);
       }
     }

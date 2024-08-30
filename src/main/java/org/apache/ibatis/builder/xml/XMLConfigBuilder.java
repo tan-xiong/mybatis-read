@@ -427,6 +427,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       return;
     }
     for (XNode child : context.getChildren()) {
+      // 1 解析package配置方式
       if ("package".equals(child.getName())) {
         String mapperPackage = child.getStringAttribute("name");
         configuration.addMappers(mapperPackage);
@@ -434,6 +435,7 @@ public class XMLConfigBuilder extends BaseBuilder {
         String resource = child.getStringAttribute("resource");
         String url = child.getStringAttribute("url");
         String mapperClass = child.getStringAttribute("class");
+        // 2 解析Resource配置全限定路径xml方式
         if (resource != null && url == null && mapperClass == null) {
           ErrorContext.instance().resource(resource);
           try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
@@ -442,6 +444,7 @@ public class XMLConfigBuilder extends BaseBuilder {
             mapperParser.parse();
           }
         } else if (resource == null && url != null && mapperClass == null) {
+          // 3 解析url本地配置或远程配置方式
           ErrorContext.instance().resource(url);
           try (InputStream inputStream = Resources.getUrlAsStream(url)) {
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url,
@@ -449,7 +452,9 @@ public class XMLConfigBuilder extends BaseBuilder {
             mapperParser.parse();
           }
         } else if (resource == null && url == null && mapperClass != null) {
+          // 4 解析mapper配置接口路径方式
           Class<?> mapperInterface = Resources.classForName(mapperClass);
+          // 向knownMappers存入映射关系
           configuration.addMapper(mapperInterface);
         } else {
           throw new BuilderException(

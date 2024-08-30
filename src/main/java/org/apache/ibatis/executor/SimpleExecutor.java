@@ -59,9 +59,13 @@ public class SimpleExecutor extends BaseExecutor {
     Statement stmt = null;
     try {
       Configuration configuration = ms.getConfiguration();
+      // 创建StatementHandler
+      // StatementHandler是可以被拦截器拦截的，众多物理分页的实现都是在这个地方使用拦截器实现的
       StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler,
           boundSql);
+      // 进行SQL查询参数的设置
       stmt = prepareStatement(handler, ms.getStatementLog());
+      // 交由StatementHandler处理
       return handler.query(stmt, resultHandler);
     } finally {
       closeStatement(stmt);

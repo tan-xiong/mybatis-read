@@ -83,25 +83,31 @@ public class CachingExecutor implements Executor {
   }
 
   @Override
-  public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler)
-      throws SQLException {
-    BoundSql boundSql = ms.getBoundSql(parameterObject);
-    CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
-    return query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
-  }
+    public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler)
+        throws SQLException {
+      // 从MappedStatement对象中获取BoundSql对象
+      BoundSql boundSql = ms.getBoundSql(parameterObject);
+      // 获取缓存Key
+      CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);
+      return query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+    }
 
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler,
       CacheKey key, BoundSql boundSql) throws SQLException {
     Cache cache = ms.getCache();
+    // 如果配置文件中没有配置 <cache>，则 cache 为空
     if (cache != null) {
       flushCacheIfRequired(ms);
       if (ms.isUseCache() && resultHandler == null) {
         ensureNoOutParams(ms, boundSql);
         @SuppressWarnings("unchecked")
+        // 从二级缓存中获取数据
         List<E> list = (List<E>) tcm.getObject(cache, key);
+        // 未命中缓存，从数据库获取
         if (list == null) {
           list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+          // 存入到 entriesToAddOnCommit 这个Map中，而非真实的缓存对象 delegate 中
           tcm.putObject(cache, key, list); // issue #578 and #116
         }
         return list;

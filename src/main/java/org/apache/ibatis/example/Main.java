@@ -24,17 +24,26 @@ public class Main {
     //初始化
     sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
     SqlSession sqlSession = null;
+    //二级缓存
+    // SqlSession sqlSession1 = null;
     try {
       sqlSession = sqlSessionFactory.openSession();
+//      sqlSession1 = sqlSessionFactory.openSession();
 
       ScheduleSettingMapper scheduleSettingMapper = sqlSession.getMapper(ScheduleSettingMapper.class);
 
+//      ScheduleSettingMapper scheduleSettingMapper1 = sqlSession1.getMapper(ScheduleSettingMapper.class);
+
       ScheduleSettingPO scheduleSettingPO = scheduleSettingMapper.findByJobId("test");
+//      sqlSession.commit();
+//      ScheduleSettingPO scheduleSettingPO1 = scheduleSettingMapper1.findByJobId("test");
 
       System.out.println("///// 数据库数据为："+scheduleSettingPO.toString());
+//      System.out.println("///// 数据库数据为："+scheduleSettingPO1.toString());
 
 
       sqlSession.commit();
+//      sqlSession1.commit();
 
     } catch (Exception e) {
       // TODO Auto-generated catch block

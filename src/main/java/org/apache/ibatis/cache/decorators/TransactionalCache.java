@@ -38,10 +38,12 @@ import org.apache.ibatis.logging.LogFactory;
 public class TransactionalCache implements Cache {
 
   private static final Log log = LogFactory.getLog(TransactionalCache.class);
-
+  // 二级缓存Map
   private final Cache delegate;
   private boolean clearOnCommit;
+  // 在事务被提交前，所有从数据库中查询的结果将缓存在此集合中
   private final Map<Object, Object> entriesToAddOnCommit;
+  // 在事务被提交前，当缓存未命中时，CacheKey 将会被存储在此集合中
   private final Set<Object> entriesMissedInCache;
 
   public TransactionalCache(Cache delegate) {
@@ -95,6 +97,7 @@ public class TransactionalCache implements Cache {
     if (clearOnCommit) {
       delegate.clear();
     }
+    // 刷新待存到缓存的数据
     flushPendingEntries();
     reset();
   }
@@ -111,6 +114,7 @@ public class TransactionalCache implements Cache {
   }
 
   private void flushPendingEntries() {
+    //  将entriesToAddOnCommit的对象添加到delegate中，二级缓存才真正的生效
     for (Map.Entry<Object, Object> entry : entriesToAddOnCommit.entrySet()) {
       delegate.putObject(entry.getKey(), entry.getValue());
     }

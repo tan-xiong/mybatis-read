@@ -6,7 +6,7 @@
 
   <properties>
     <property name="driver" value="com.mysql.jdbc.Driver"/>
-    <property name="url" value="jdbc:mysql://192.168.200.108:3306/txwork_lite"/>
+    <property name="url" value="jdbc:mysql://localhost:3306/txwork_lite"/>
     <property name="username" value="root"/>
     <property name="password" value="123456"/>
   </properties>
